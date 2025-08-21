@@ -4,7 +4,10 @@ from app.services import recommender, fail_analyzer
 from sqlalchemy.orm import Session
 from app.db import get_db
 
-app = FastAPI()
+app = FastAPI(
+    title="MOCA AI API",
+    docs_url="/docs"
+)
 
 @app.get("/status")
 def health_check():
