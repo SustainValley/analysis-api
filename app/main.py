@@ -1,6 +1,8 @@
 # FastAPI 엔드포인트
-from fastapi import FastAPI
-from app.services import recommender
+from fastapi import FastAPI, Depends
+from app.services import recommender, fail_analyzer
+from sqlalchemy.orm import Session
+from app.db import get_db
 
 app = FastAPI()
 
@@ -22,3 +24,8 @@ def promotion(cafe_id: str):
         "예약비중": f"{percent}%",
         "추천_프로모션": message
     }
+
+
+@app.get("/cafe/{cafe_id}/cancel-reason")
+def cancel_reason_stats(cafe_id: int, year: int, month: int, db: Session = Depends(get_db)):
+    return fail_analyzer.get_cancel_reason_percentage(db, cafe_id, year, month)
