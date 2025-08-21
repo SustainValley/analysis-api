@@ -6,6 +6,9 @@ from app.db import get_db
 
 app = FastAPI()
 
+@app.get("/status")
+def health_check():
+    return {"status": "ok"}
 
 @app.get("/promotion/{cafe_id}")
 def promotion(cafe_id: str):
