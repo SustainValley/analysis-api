@@ -27,5 +27,5 @@ gongneung_cafe_df = merged_df[
 ]
 
 # 저장
-gongneung_cafe_df.to_csv('/Users/jeong-yujin/analysis-api/app/data/gongneung_cafe.csv', index=False, encoding='utf-8-sig')
+gongneung_cafe_df.to_csv('/Users/jeong-yujin/csv_model_project/gongneung_cafe.csv', index=False, encoding='utf-8-sig')
 print(f"공릉1동,2동 카페 데이터 저장 완료! ({len(gongneung_cafe_df)}행)")
