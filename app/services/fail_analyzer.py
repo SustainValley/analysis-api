@@ -13,16 +13,21 @@ FOCUS_REASONS = [
     CancelReason.BUDGET_ISSUE
 ]
 
-def get_cancel_reason_percentage(db: Session, cafe_id: int, year: int, month: int):
+def get_cancel_reason_percentage(db: Session, cafe_id: int):
+    # 현재 시각 기준 이전 달 계산
+    now = datetime.now()
+    prev_month = now.month - 1
+    prev_year = now.year
+    if prev_month == 0:
+        prev_month = 12
+        prev_year -= 1
+    
     # 월 범위 계산
-    start_date = f"{year:04d}-{month:02d}-01"
-    if month == 12:
-        end_year = year + 1
-        end_month = 1
+    start_date = f"{prev_year:04d}-{prev_month:02d}-01"
+    if prev_month == 12:
+        end_date = f"{prev_year + 1}-01-01"
     else:
-        end_year = year
-        end_month = month + 1
-    end_date = f"{end_year:04d}-{end_month:02d}-01"
+        end_date = f"{prev_year:04d}-{prev_month + 1:02d}-01"
 
     # 전체 예약 수
     total_count = db.query(Reservation).filter(
@@ -54,7 +59,7 @@ def get_cancel_reason_percentage(db: Session, cafe_id: int, year: int, month: in
 
     return {
         "cafe_id": cafe_id,
-        "year": year,
-        "month": month,
+        "year": prev_year,
+        "month": prev_month,
         "focused_cancel_reason": result
     }
