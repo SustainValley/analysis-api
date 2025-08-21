@@ -47,17 +47,17 @@ def get_current_status():
     weekday = weekday_map[now.weekday()]
 
     if hour < 6:
-        time_slot = "~06"
+        time_slot = "00~06"
     elif hour < 11:
-        time_slot = "~11"
+        time_slot = "06~11"
     elif hour < 14:
-        time_slot = "~14"
+        time_slot = "11~14"
     elif hour < 17:
-        time_slot = "~17"
+        time_slot = "14~17"
     elif hour < 21:
-        time_slot = "~21"
+        time_slot = "17~21"
     else:
-        time_slot = "~24"
+        time_slot = "21~24"
 
     row = cafe_status_df[
         (cafe_status_df['요일'] == weekday) & 
