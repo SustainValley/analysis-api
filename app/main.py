@@ -33,5 +33,5 @@ def promotion(cafe_id: str):
 
 
 @app.get("/cafe/{cafe_id}/cancel-reason")
-def cancel_reason_stats(cafe_id: int, year: int, month: int, db: Session = Depends(get_db)):
-    return fail_analyzer.get_cancel_reason_percentage(db, cafe_id, year, month)
+def cancel_reason(cafe_id: int, db: Session = Depends(get_db)):
+    return fail_analyzer.get_cancel_reason_percentage(db, cafe_id)
