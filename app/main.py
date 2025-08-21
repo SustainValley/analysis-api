@@ -20,12 +20,12 @@ def promotion(cafe_id: str):
 
     message = recommender.get_promotion_message(status, main_type)
     return {
-        "요일": weekday,
-        "시간대": time_slot,
-        "예상_상태": status,
-        "주된_예약목적": main_type,
-        "예약비중": f"{percent}%",
-        "추천_프로모션": message
+        "dayOfWeek": weekday,
+        "timeSlot": time_slot,
+        "commercial_status": status,
+        "main_purpose": main_type,
+        "percent": f"{percent}%",
+        "rec_promotion": message
     }
 
 
