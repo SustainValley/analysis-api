@@ -91,9 +91,30 @@ def generate_promotion_message(status: str, main_meeting_type: str, dayOfWeek: s
         {"role": "system", "content": "너는 카페 프로모션을 기획하는 마케터다."},
         {"role": "user", "content": prompt}
     ],
-    temperature=0.8,
+    temperature=1,
     max_tokens=100
 )
 
     return response.choices[0].message.content.strip()
 
+# 사장용 프로모션 아이디어를 받아서 고객에게 보여줄 홍보 문구 생성
+def generate_customer_message(owner_promo: str) -> str:
+    prompt = f"""
+    너는 카페 마케팅 담당자야.
+    아래는 사장에게 추천된 프로모션 아이디어야:
+    "{owner_promo}"
+
+    이 아이디어를 바탕으로 고객이 흥미를 가질 수 있는 자연스러운 홍보 문구를 1문장으로 만들어줘.
+    너무 기계적이지 않고, 고객이 이해하기 쉽게 작성해줘.
+    """
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "너는 카페 프로모션을 기획하는 마케터다."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.8,
+        max_tokens=100
+    )
+
+    return response.choices[0].message.content.strip()

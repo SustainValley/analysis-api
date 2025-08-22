@@ -1,9 +1,10 @@
 # FastAPI 엔드포인트
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from app.services import recommender, fail_analyzer
 from sqlalchemy.orm import Session
 from app.db import get_db
+from pydantic import BaseModel
 
 app = FastAPI(
     title="MOCA AI API",
@@ -23,6 +24,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Body로 받을 모델 정의
+class CustomerPromoRequest(BaseModel):
+    rec_promotion: str
 
 @app.get("/status")
 def health_check():
@@ -45,6 +51,11 @@ def promotion(cafe_id: str):
         "percent": f"{percent}%",
         "rec_promotion": message
     }
+
+@app.post("/customer_promotion")
+def customer_promotion(req: CustomerPromoRequest):
+    customer_message = recommender.generate_customer_message(req.rec_promotion)
+    return {"customer_promo": customer_message}
 
 
 @app.get("/cafe/{cafe_id}/cancel-reason")
