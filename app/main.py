@@ -21,7 +21,7 @@ def promotion(cafe_id: str):
     if main_type is None:
         return {"error": "해당 카페의 예약 데이터가 없습니다."}
 
-    message = recommender.get_promotion_message(status, main_type)
+    message = recommender.generate_promotion_message(status, main_type, weekday, time_slot)
     return {
         "dayOfWeek": weekday,
         "timeSlot": time_slot,

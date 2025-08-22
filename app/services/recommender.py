@@ -3,6 +3,8 @@
 import pandas as pd
 from datetime import datetime
 import os
+from openai import OpenAI
+from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from app.db import SessionLocal
 from app.models.models import Reservation, MeetingType
@@ -12,32 +14,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 CAFE_STATUS_PATH = os.path.join(BASE_DIR, "data", "weekday_time_status.csv")
 cafe_status_df = pd.read_csv(CAFE_STATUS_PATH)
 
-PROMOTION_RULES = {
-    "비활성화": {
-        "STUDY": "3시간 이용 시 아메리카노 증정",
-        "PROJECT": "팀 단체 할인 쿠폰 제공",
-        "MEETING": "커피 1+1 제공",
-        "INTERVIEW": "조용한 룸 무료 제공",
-        "NETWORKING": "소규모 모임 할인",
-        "ETC": "방문 시 소정의 음료 쿠폰 증정"
-    },
-    "보통": {
-        "STUDY": "음료 10% 할인",
-        "PROJECT": "단체 음료 1잔 무료",
-        "MEETING": "기본 서비스 안내 쿠폰",
-        "INTERVIEW": "음료 5% 할인",
-        "NETWORKING": "모임 예약 시 간단 다과 제공",
-        "ETC": "방문 시 쿠폰 제공"
-    },
-    "활성화": {
-        "STUDY": "일반 요금 적용",
-        "PROJECT": "일반 요금 적용",
-        "MEETING": "일반 요금 적용",
-        "INTERVIEW": "일반 요금 적용",
-        "NETWORKING": "일반 요금 적용",
-        "ETC": "일반 요금 적용"
-    }
-}
+load_dotenv()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def get_current_status():
     """현재 시간대와 요일에 맞는 상권 상태 반환"""
@@ -86,7 +64,36 @@ def get_main_meeting_type(cafe_id: int):
         return main_type, percent
     finally:
         db.close()
+     
+# GPT에게 상권 상태와 예약 목적을 넘겨주고,적절한 프로모션 메시지를 생성해주는 함수   
+def generate_promotion_message(status: str, main_meeting_type: str, dayOfWeek: str, timeSlot: str) -> str:
+ 
+    prompt = f"""
+    너는 카페 마케팅 담당자야.
+    현재 카페 상권 상태는 "{status}"이고,
+    주요 예약 목적은 "{main_meeting_type}"이야.
+    오늘 요일은 "{dayOfWeek}", 시간대는 "{timeSlot}"이야.
 
+    조건:
+    1. 이 메시지는 고객에게 보여주는 것이 아니라, 카페 사장에게 프로모션 아이디어를 추천하는 내용이어야 함.
+    2. 프로모션은 현실적이어야 하고, 사장이 손해보지 않도록 구성.
+        (예: 무료 제공보다는 추가 매출이 발생하는 현실적인 할인이나 세트 구성 등)
+    3. 상권 상태가 "보통" 이상이면 강한 프로모션은 필요없고,
+        상권 상태가 "비활성화"일 때 집중적으로 고객을 유입할 수 있는 프로모션을 제안.
+    4. 어투은 자연스럽게, 간단히 1문장 정도로, 마지막에 “~하는 건 어떨까요?” 식으로 권고형/제안형 톤으로 마무리.
 
-def get_promotion_message(status: str, main_meeting_type: str) -> str:
-    return PROMOTION_RULES.get(status, {}).get(main_meeting_type, "방문 시 혜택 없음")
+    위 조건을 반영해서, 고객에게 제공할 수 있는 프로모션 아이디어를 제안해줘.
+    """
+
+    response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "너는 카페 프로모션을 기획하는 마케터다."},
+        {"role": "user", "content": prompt}
+    ],
+    temperature=0.8,
+    max_tokens=100
+)
+
+    return response.choices[0].message.content.strip()
+
