@@ -1,5 +1,6 @@
 # FastAPI 엔드포인트
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from app.services import recommender, fail_analyzer
 from sqlalchemy.orm import Session
 from app.db import get_db
@@ -7,6 +8,20 @@ from app.db import get_db
 app = FastAPI(
     title="MOCA AI API",
     docs_url="/docs"
+)
+
+# 프론트 CORS 설정
+origins = [
+    "http://localhost:3000",
+    "https://mocacafe.vercel.app"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/status")
