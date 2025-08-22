@@ -16,7 +16,7 @@ FOCUS_REASONS = [
 def get_cancel_reason_percentage(db: Session, cafe_id: int):
     # 현재 시각 기준 이전 달 계산
     now = datetime.now()
-    prev_month = now.month - 1
+    prev_month = now.month
     prev_year = now.year
     if prev_month == 0:
         prev_month = 12
@@ -41,7 +41,7 @@ def get_cancel_reason_percentage(db: Session, cafe_id: int):
         CancelReason.CLOSED_TIME,
         CancelReason.EQUIPMENT_UNAVAILABLE,
         CancelReason.PEAK_LIMIT,
-        CancelReason.NO_SHOW,
+        CancelReason.CROWDED,
         CancelReason.LOCATION_CHANGE,
         CancelReason.BUDGET_ISSUE,
     ]
