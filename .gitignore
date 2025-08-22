@@ -22,3 +22,4 @@ Thumbs.db
 
 config/aws_credentials.json
 secret_keys/
+.env
