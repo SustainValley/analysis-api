@@ -1,7 +1,8 @@
 ## MOCA 분석 코드
 
 #### 파일구조
-promotion-analysis-api/
+```
+promotion-analysis-api/프로모션 분석 ​​-API/
 ├── app/
 │   ├── main.py          # FastAPI , 프로모션 추천 & 취소/거절 사유 분석 API
 │   ├── data/
@@ -11,6 +12,7 @@ promotion-analysis-api/
 │   │   └── gongneung_cafe.csv   
 │   ├── services/
 │   │   ├── recommender.py      # 프로모션 추천 로직
+│   │   ├── recommender.py      # 프로모션 추천 로직
 │   │   └── fail_analyzer.py    # 예약 실패 분석 로직
 │   ├── models/
 |   |   ├── cafe.py
@@ -19,7 +21,7 @@ promotion-analysis-api/
 │   │   └── models.py           # 데이터 모델 설계  
 │   └── db.py                   # DB 연결
 └──  requirements.txt
-
+``````````````
 
 #### 코드 컨벤션
 | Commit Type | 설명 |
