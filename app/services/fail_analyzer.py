@@ -1,5 +1,6 @@
 # 예약 거절/실패 분석 로직
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from sqlalchemy.orm import Session
 from app.models.models import Reservation, CancelReason
 
@@ -8,7 +9,7 @@ FOCUS_REASONS = [
     CancelReason.CLOSED_TIME,
     CancelReason.EQUIPMENT_UNAVAILABLE,
     CancelReason.PEAK_LIMIT,
-    CancelReason.NO_SHOW,
+    CancelReason.CROWDED,
     CancelReason.LOCATION_CHANGE,
     CancelReason.BUDGET_ISSUE
 ]
@@ -16,19 +17,11 @@ FOCUS_REASONS = [
 def get_cancel_reason_percentage(db: Session, cafe_id: int):
     # 현재 시각 기준 이전 달 계산
     now = datetime.now()
-    prev_month = now.month
-    prev_year = now.year
-    if prev_month == 0:
-        prev_month = 12
-        prev_year -= 1
     
-    # 월 범위 계산
-    start_date = f"{prev_year:04d}-{prev_month:02d}-01"
-    if prev_month == 12:
-        end_date = f"{prev_year + 1}-01-01"
-    else:
-        end_date = f"{prev_year:04d}-{prev_month + 1:02d}-01"
-
+    # 앞뒤 한 달 범위
+    start_date = (now - relativedelta(months=1)).strftime("%Y-%m-%d")
+    end_date = (now + relativedelta(months=1)).strftime("%Y-%m-%d")
+    
     # 전체 예약 수
     total_count = db.query(Reservation).filter(
         Reservation.cafe_id == cafe_id,
@@ -47,19 +40,18 @@ def get_cancel_reason_percentage(db: Session, cafe_id: int):
     ]
 
     result = []
-    for reason in target_reasons:
+    for reason in FOCUS_REASONS:
         count = db.query(Reservation).filter(
             Reservation.cafe_id == cafe_id,
             Reservation.cancel_reason == reason,
             Reservation.date >= start_date,
             Reservation.date < end_date
         ).count()
-        percentage = (count / total_count * 100) if total_count > 0 else 0
-        result.append({reason.name: f"{percentage:.1f}%"})
+        result.append({reason.name: count})
 
     return {
         "cafe_id": cafe_id,
-        "year": prev_year,
-        "month": prev_month,
+        "year": now.year,
+        "month": now.month,
         "focused_cancel_reason": result
     }
