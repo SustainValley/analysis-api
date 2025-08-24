@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 from app.db import SessionLocal
 from app.models.models import Reservation, MeetingType
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # CSV 경로 (요일/시간대 상태는 여전히 파일 사용)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -19,7 +21,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def get_current_status():
     """현재 시간대와 요일에 맞는 상권 상태 반환"""
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Asia/Seoul"))
     weekday_map = ['월요일','화요일','수요일','목요일','금요일','토요일','일요일']
     hour = now.hour
     weekday = weekday_map[now.weekday()]
@@ -104,7 +106,7 @@ def generate_customer_message(owner_promo: str) -> str:
     아래는 사장에게 추천된 프로모션 아이디어야:
     "{owner_promo}"
 
-    이 아이디어를 바탕으로 고객이 흥미를 가질 수 있는 자연스러운 홍보 문구를 1문장으로 만들어줘.
+    이 아이디어를 바탕으로 고객이 흥미를 가질 수 있는 자연스러운 홍보 문구를 1문장 분량은 띄어쓰기 포함 최대 90자로 만들어줘.
     너무 기계적이지 않고, 고객이 이해하기 쉽게 작성해줘.
     """
     response = client.chat.completions.create(

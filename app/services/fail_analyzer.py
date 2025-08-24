@@ -4,6 +4,8 @@ from dateutil.relativedelta import relativedelta
 from sqlalchemy.orm import Session
 from app.models.models import Reservation, CancelReason
 from openai import OpenAI 
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # 관심 있는 사유 6개
 FOCUS_REASONS = [
@@ -20,7 +22,7 @@ client = OpenAI()
 
 def get_cancel_reason_percentage(db: Session, cafe_id: int):
     # 현재 시각 기준 이전 달 계산
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Asia/Seoul"))
     
     # 앞뒤 한 달 범위
     start_date = (now - relativedelta(months=1)).strftime("%Y-%m-%d")
