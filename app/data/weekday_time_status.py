@@ -26,21 +26,17 @@ time_avg = df[time_cols].mean()
 predicted_list = [(3*wd_val + t_val)/4 for wd_val in weekday_avg.values for t_val in time_avg.values]
 predicted_array = np.array(predicted_list)
 
-# 분위수 기준 계산
-low_thresh = np.percentile(predicted_array, 40)   # 하위 30% -> 비활성화
-high_thresh = np.percentile(predicted_array, 60)  # 상위 30% -> 활성화
+mean_val = predicted_array.mean()
 
 result = []
 
 for wd_col, wd_val in weekday_avg.items():
     for t_col, t_val in time_avg.items():
         predicted = (3*wd_val + t_val) / 4
-        if predicted <= low_thresh:
+        if predicted < mean_val:
             status = '비활성화'
-        elif predicted >= high_thresh:
-            status = '활성화'
         else:
-            status = '보통'
+            status = '활성화'
             
         result.append({
             '요일': wd_col.replace('_매출_건수',''),
